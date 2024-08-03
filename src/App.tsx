@@ -1,12 +1,10 @@
 import {useState} from 'react'
-import './App.css'
 import { Row } from './Row';
 import { ValidChar } from './shared';
 
 function App() {
-
   return (
-    <div className='flex flex-rows-1'>
+    <div className='flex flex-rows-1 place-content-center p-5'>
       <Table/>
     </div>
   )
