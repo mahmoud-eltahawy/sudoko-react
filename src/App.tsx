@@ -3,8 +3,10 @@ import { BoardContext, BoardContextSetter } from './BoardContext';
 import { Board } from './Board';
 // import {is_valid_sudoku} from 'blazing_fast'
 
+export const SIZE = 9; 
+
 function App() {
-  const [rows,set_rows] = useState(new Uint8Array(81).fill(0))
+  const [rows,set_rows] = useState(new Uint8Array(SIZE * SIZE).fill(0))
   return (
       <BoardContext.Provider value={rows}>
         <BoardContextSetter.Provider value={set_rows}>
