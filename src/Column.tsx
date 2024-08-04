@@ -6,7 +6,6 @@ export function Column({ index }: { index : number, }) {
     const rows = useContext(BoardContext);
     const set_rows = useContext(BoardContextSetter);
 
-
     const on_input = (e: ChangeEvent<HTMLInputElement>) => {
         const new_value = +e.target.value;
         if (valid_chars.includes(new_value)) {
@@ -18,12 +17,14 @@ export function Column({ index }: { index : number, }) {
         }
     };
 
+    const value = rows![index] == 0 ? "" : rows![index]
+
     return (
         <td className="size-24 border-2">
             <input
                 className="size-24 text-center"
                 type='number'
-                value={rows[index]}
+                value={value}
                 onInput={on_input}
              />
         </td>
