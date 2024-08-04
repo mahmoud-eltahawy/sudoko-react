@@ -1,21 +1,27 @@
 import { Column } from "./Column";
-import {ValidChar} from './shared'
 
 export type RowProps = {
-  y : number,
-  rows: ValidChar[][],
-  set_rows : React.Dispatch<React.SetStateAction<ValidChar[][]>>
+  index : number,
+  rows: Uint8Array,
+  set_rows : React.Dispatch<React.SetStateAction<Uint8Array>>
 };
 
 export function Row(
-    { rows, y, set_rows }: RowProps) {
+    { rows, index, set_rows }: RowProps) {
 
     return (
-        <tr>{rows[y].map((_, x) => <Column
-            key={x}
-            y={y}
-            x={x}
-            rows={rows}
-            set_rows={set_rows} />)}</tr>
+        <tr>{mapArray(rows,set_rows,index)}</tr>
     );
+}
+
+function mapArray(rows : Uint8Array,set_rows :  React.Dispatch<React.SetStateAction<Uint8Array>>,y : number) {
+    const result = [];
+    for (let x = y; x < (y + 9);x++) {
+        result.push(<Column
+            key={x}
+            index={x}
+            rows={rows}
+            set_rows={set_rows} />)
+    }
+    return result
 }

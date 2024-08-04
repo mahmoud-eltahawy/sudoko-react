@@ -1,6 +1,6 @@
 import {useState} from 'react'
 import { Row } from './Row';
-import { ValidChar } from './shared';
+// import {is_valid_sudoku} from 'blazing_fast'
 
 function App() {
   return (
@@ -11,21 +11,28 @@ function App() {
 }
 
 function Table() {
-  const [rows,set_rows] = useState<ValidChar[][]>(new Array(9).fill(new Array(9).fill('.')));
+  const [rows,set_rows] = useState(new Uint8Array(81).fill(0))
 
   return (
     <table className="table-fixed text-3xl">
       <tbody>
-        {
-        rows.map((_,row) => <Row 
-          key={row} 
-          y={row} 
-          rows={rows} 
-          set_rows={set_rows}/>)
-        }
+        {mapArray(rows,set_rows)}
       </tbody>
     </table>
   )
+}
+
+function mapArray(rows : Uint8Array,set_rows : React.Dispatch<React.SetStateAction<Uint8Array>>) {
+  const result = [];
+  for (let row = 0; row < 81; row += 9) {
+    result.push(<Row 
+          key={row} 
+          index={row} 
+          rows={rows} 
+          set_rows={set_rows}/>
+        )
+  }
+  return result
 }
 
 export default App
