@@ -4,13 +4,14 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "pre": "cd blazing-fast && wasm-pack build --target nodejs --out-dir ../node_modules/blazing_fast",
+    "pre": "wasm-pack build --target web --out-dir ./blazing_fast/pkg ./blazing-fast && bun install",
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "bun run pre && tsc -b && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
   },
   "dependencies": {
+    "blazing-fast": "./blazing-fast/pkg/",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
