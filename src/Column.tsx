@@ -1,14 +1,16 @@
-import { ChangeEvent } from "react";
+import { ChangeEvent, useContext } from "react";
 import { valid_chars, ValidChar } from "./shared";
-import { RowProps } from "./Row";
+import { BoardContext, BoardContextSetter } from "./BoardContext";
+
+export function Column({ index }: { index : number, }) {
+    const rows = useContext(BoardContext);
+    const set_rows = useContext(BoardContextSetter);
 
 
-
-export function Column({ rows, index, set_rows }: RowProps) {
     const on_input = (e: ChangeEvent<HTMLInputElement>) => {
         const new_value = +e.target.value;
         if (valid_chars.includes(new_value)) {
-            set_rows(xs => {
+            set_rows!(xs => {
                 const new_xs  = new Uint8Array(xs);
                 new_xs[index] = new_value as ValidChar;
                 return new_xs;
