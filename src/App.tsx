@@ -6,7 +6,7 @@ import {is_valid_sudoku,level} from 'blazing-fast'
 export const SIZE = 9; 
 
 const success = "bg-lime-950"
-const failure= "bg-red-950"
+const failure = "bg-red-950"
 
 function App() {
   const [board,set_board] = useState(level(0))

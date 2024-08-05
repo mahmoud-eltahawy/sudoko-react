@@ -145,19 +145,7 @@ struct SodokuElement {
 
 impl SodokuElement {
     fn from(row: usize, column: usize) -> Self {
-        let area = match (row, column) {
-            (0..3, 0..3) => 0,
-            (0..3, 3..6) => 1,
-            (0..3, 6..9) => 2,
-            (3..6, 0..3) => 3,
-            (3..6, 3..6) => 4,
-            (3..6, 6..9) => 5,
-            (6..9, 0..3) => 6,
-            (6..9, 3..6) => 7,
-            (6..9, 6..9) => 8,
-            _ => unreachable!(),
-        };
-
+        let area = (row / 3) * 3 + (column / 3);
         Self { row, column, area }
     }
 }
