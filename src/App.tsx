@@ -7,7 +7,10 @@ export const SIZE = 9;
 
 function App() {
   const [rows,set_rows] = useState(new Uint8Array(SIZE * SIZE).fill(0))
-  const is_it = is_valid_sudoku(rows);
+  let is_it = true; 
+  try {
+    is_it = is_valid_sudoku(rows);
+  } catch(_e) {}
   return (
       <BoardContext.Provider value={rows}>
         <BoardContextSetter.Provider value={set_rows}>

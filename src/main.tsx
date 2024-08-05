@@ -6,13 +6,9 @@ import init from 'blazing-fast'
 
 
 init()
-  .then(() => {
-    ReactDOM.createRoot(document.getElementById('root')!).render(
-      <React.StrictMode>
-        <App />
-      </React.StrictMode>,
-    )
 
-  })
-  .catch(e => console.log("Error ",e))
-
+ReactDOM.createRoot(document.getElementById('root')!).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>,
+)
