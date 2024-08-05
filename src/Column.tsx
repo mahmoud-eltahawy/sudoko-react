@@ -20,7 +20,7 @@ export function Column({ index }: { index : number, }) {
     const value = rows![index] == 0 ? "" : rows![index]
 
     return (
-        <td className="size-24 border-2">
+        <td className="size-24">
             <input
                 className="size-24 text-center"
                 type='number'
