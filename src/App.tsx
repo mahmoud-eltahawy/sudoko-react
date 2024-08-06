@@ -14,7 +14,9 @@ function App() {
   const [index , set_index] = useState(0);
   const [board,set_board] = useState(level(0))
   const [win_modal,set_win_modal] = useState(false);
-  const is_valid = is_valid_sudoku(board) ? success : failure;
+
+  const is_valid = is_valid_sudoku(board);
+  const is_valid_style = is_valid ? success : failure;
 
   useEffect(() => {
     set_board(level(index));
@@ -29,12 +31,12 @@ function App() {
   const on_next_click=() => {
       set_index(x => x + 1);
       set_win_modal(false)               
-   };
+  };
 
   return (
       <BoardContext.Provider value={board}>
         <BoardContextSetter.Provider value={set_board}>
-        <main className={'h-screen w-screen flex flex-rows-1 gap-5 place-content-center p-5 ' + is_valid}>
+        <main className={'h-screen w-screen flex flex-rows-1 gap-5 place-content-center p-5 ' + is_valid_style}>
           <Board/>
           {
            win_modal 

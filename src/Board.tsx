@@ -1,22 +1,18 @@
 import { SIZE } from "./App";
-import { Row } from "./Row";
+import { Column } from "./Column";
 
 export function Board() {
-
     return (
         <div className="grid grid-cols-9 gap-2 text-3xl">
-            {tableRows()}
+            {all_columns()}
         </div>
     );
 }
 
-function tableRows() {
+function all_columns() {
     const result : JSX.Element[] = new Array(SIZE);
-    for (let row = 0; row < (SIZE * SIZE); row += SIZE) {
-        result.push(<Row
-            key={row}
-            index={row} />
-        );
+    for (let i = 0; i < (SIZE * SIZE); i += 1) {
+        result.push(<Column index={i}/>);
     }
     return result;
 }
