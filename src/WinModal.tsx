@@ -1,9 +1,14 @@
 
 type WinModalParams = { 
   on_next_click : () => void
+  show : boolean
 };
 
-export function WinModal({ on_next_click} : WinModalParams) {
+export function WinModal({ on_next_click, show} : WinModalParams) {
+
+    if (!show) {
+       return; 
+    }
 
     return (
         <div

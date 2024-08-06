@@ -39,13 +39,7 @@ function App() {
         <BoardContextSetter.Provider value={set_board}>
         <main className={'h-screen w-screen flex flex-rows-1 gap-5 place-content-center p-5 ' + is_valid_style}>
           <Board/>
-          {
-           win_modal 
-           ? <WinModal 
-               on_next_click={on_next_click}
-             /> 
-           : <></>
-          }
+          <WinModal on_next_click={on_next_click} show={win_modal}/> 
         </main>
         </BoardContextSetter.Provider>
       </BoardContext.Provider>
