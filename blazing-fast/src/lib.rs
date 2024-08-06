@@ -78,7 +78,14 @@ pub fn level(index: usize) -> Vec<u8> {
 }
 
 #[wasm_bindgen]
+pub fn is_sudoku_board_full(board: Vec<u8>) -> bool {
+    assert_eq!(board.len(), SIZE_SQUARED);
+    !board.into_iter().any(|x| x == 0)
+}
+
+#[wasm_bindgen]
 pub fn is_valid_sudoku(board: Vec<u8>) -> bool {
+    assert_eq!(board.len(), SIZE_SQUARED);
     let mut map = HashMap::<u8, Sodoku>::with_capacity(SIZE);
     !board
         .windows(SIZE)
@@ -186,5 +193,44 @@ mod tests {
         for i in 0..LEVELS_NUMBER {
             assert!(is_valid_sudoku(level(i)));
         }
+    }
+
+    #[test]
+    fn full_board() {
+        assert!(is_sudoku_board_full(vec![
+            1, 2, 3, 4, 5, 6, 7, 8, 9, //
+            4, 5, 6, 7, 8, 9, 1, 2, 3, //
+            7, 8, 9, 1, 2, 3, 4, 5, 6, //
+            2, 3, 4, 5, 6, 7, 8, 9, 1, //
+            5, 6, 7, 8, 9, 1, 2, 3, 4, //
+            8, 9, 1, 2, 3, 4, 5, 6, 7, //
+            3, 4, 5, 6, 7, 8, 9, 1, 2, //
+            6, 7, 8, 9, 1, 2, 3, 4, 5, //
+            9, 1, 2, 3, 4, 5, 6, 7, 8, //
+        ]));
+
+        assert!(!is_sudoku_board_full(vec![
+            0, 2, 3, 4, 5, 6, 7, 8, 9, //
+            4, 5, 6, 7, 8, 9, 1, 2, 3, //
+            7, 8, 9, 1, 2, 3, 4, 5, 6, //
+            2, 3, 4, 5, 6, 7, 8, 9, 1, //
+            5, 6, 7, 8, 9, 1, 2, 3, 4, //
+            8, 9, 1, 2, 3, 4, 5, 6, 7, //
+            3, 4, 5, 6, 7, 8, 9, 1, 2, //
+            6, 7, 8, 9, 1, 2, 3, 4, 5, //
+            9, 1, 2, 3, 4, 5, 6, 7, 8, //
+        ]));
+
+        assert!(!is_sudoku_board_full(vec![
+            1, 2, 3, 4, 5, 6, 7, 8, 9, //
+            4, 5, 6, 7, 8, 9, 1, 2, 3, //
+            7, 8, 9, 1, 2, 3, 4, 5, 6, //
+            2, 3, 4, 5, 6, 7, 8, 9, 1, //
+            5, 6, 7, 8, 9, 1, 2, 3, 4, //
+            8, 9, 1, 2, 3, 4, 5, 6, 7, //
+            3, 4, 5, 6, 7, 8, 9, 1, 2, //
+            6, 7, 8, 9, 1, 2, 3, 4, 5, //
+            9, 1, 2, 3, 4, 5, 6, 7, 0, //
+        ]));
     }
 }

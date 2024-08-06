@@ -15,7 +15,5 @@ export function Row(
         return result
     }
 
-    return (
-        <tr>{map()}</tr>
-    );
+    return map();
 }

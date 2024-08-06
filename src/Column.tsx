@@ -17,16 +17,19 @@ export function Column({ index }: { index : number, }) {
         }
     };
 
-    const value = rows![index] == 0 ? "" : rows![index]
+    const column_value = rows![index];
+    // const disabled = useRef(column_value !== 0);
+
+    const value = column_value === 0 ? "" : column_value
 
     return (
-        <td className="size-24">
-            <input
-                className="size-24 text-center"
-                type='number'
-                value={value}
-                onInput={on_input}
-             />
-        </td>
+        <input
+            id={`column-number-${index}`}
+            className="size-24 text-center"
+            pattern="[0-9]"
+            value={value}
+            // disabled={disabled.current}
+            onInput={on_input}
+         />
     );
 }

@@ -4,11 +4,9 @@ import { Row } from "./Row";
 export function Board() {
 
     return (
-        <table className="table-fixed text-3xl">
-            <tbody>
-                {tableRows()}
-            </tbody>
-        </table>
+        <div className="grid grid-cols-9 gap-2 text-3xl">
+            {tableRows()}
+        </div>
     );
 }
 
