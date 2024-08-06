@@ -105,8 +105,8 @@ pub fn is_valid_sudoku(board: Vec<u8>) -> bool {
         .into_iter()
         .enumerate()
         .filter(|(_, x)| *x != 0)
-        .map(|(index, number)| (number, SUDOKO_IDS[index].clone()))
-        .any(|(number, id)| {
+        .any(|(index, number)| {
+            let id = &SUDOKO_IDS[index];
             match map.get_mut(&number) {
                 Some(sodokus) => {
                     if sodokus.exists(id) {
@@ -128,14 +128,14 @@ struct Sodoku {
 }
 
 impl Sodoku {
-    fn new(SodokuId { row, column, area }: SodokuId) -> Self {
+    fn new(SodokuId { row, column, area }: &SodokuId) -> Self {
         let mut rows = HashSet::with_capacity(9);
         let mut columns = HashSet::with_capacity(9);
         let mut areas = HashSet::with_capacity(9);
 
-        rows.insert(row);
-        columns.insert(column);
-        areas.insert(area);
+        rows.insert(*row);
+        columns.insert(*column);
+        areas.insert(*area);
 
         Self {
             rows,
@@ -144,15 +144,11 @@ impl Sodoku {
         }
     }
 
-    fn exists(&mut self, SodokuId { row, column, area }: SodokuId) -> bool {
-        let rows = self.rows.insert(row);
-        let columns = self.columns.insert(column);
-        let areas = self.areas.insert(area);
-        !rows || !columns || !areas
+    fn exists(&mut self, SodokuId { row, column, area }: &SodokuId) -> bool {
+        !self.rows.insert(*row) || !self.columns.insert(*column) || !self.areas.insert(*area)
     }
 }
 
-#[derive(Debug, Clone)]
 struct SodokuId {
     row: usize,
     column: usize,
