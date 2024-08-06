@@ -6,7 +6,7 @@ import { WinModal } from './WinModal';
 
 export const SIZE = 9; 
 
-const success = "bg-lime-950"
+const success = "bg-green-950"
 const failure = "bg-red-950"
 
 
@@ -41,7 +41,7 @@ function App() {
         <BoardContextSetter.Provider value={set_board}>
           <TriggerContext.Provider value={trigger}>
         <main className={'h-screen w-screen flex flex-wrap gap-5 place-content-center p-5 ' + is_valid_style}>
-          <h2 className='w-screen text-center text-3xl text-white'>{`LEVEL ${level + 1}`}</h2>
+          <h2 className='w-screen text-center text-3xl text-teal-400'>{`LEVEL ${level + 1}`}</h2>
           <Board/>
           <WinModal on_next_click={on_next_click} show={win_modal}/> 
         </main>

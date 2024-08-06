@@ -26,7 +26,7 @@ export function Column({ index }: { index : number }) {
     return (
         <input
             id={`column-number-${index}`}
-            className={"size-20 text-center rounded-lg " + which_color(index)}
+            className={`size-20 text-center rounded-lg ${which_color(index)} ${!disabled ? "bg-yellow-100" : ""}` }
             pattern="^[0-9]$"
             value={value}
             disabled={disabled}
