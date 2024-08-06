@@ -1,7 +1,7 @@
 {
   "name": "sudoko-react",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.0.1",
   "type": "module",
   "scripts": {
     "pre": "wasm-pack build --target web --out-dir pkg ./blazing-fast && npm install",
