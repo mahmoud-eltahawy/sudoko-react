@@ -71,7 +71,7 @@ const LEVELS: [u8; TOTAL_LEVELS_SIZE] = [
 ];
 
 #[wasm_bindgen]
-pub fn level(index: usize) -> Vec<u8> {
+pub fn get_level(index: usize) -> Vec<u8> {
     let index = index % LEVELS_NUMBER;
     let begin = index * SIZE_SQUARED;
     LEVELS[begin..(begin + SIZE_SQUARED)].to_vec()
@@ -191,7 +191,7 @@ mod tests {
     #[test]
     fn valid_levels() {
         for i in 0..LEVELS_NUMBER {
-            assert!(is_valid_sudoku(level(i)));
+            assert!(is_valid_sudoku(get_level(i)));
         }
     }
 
