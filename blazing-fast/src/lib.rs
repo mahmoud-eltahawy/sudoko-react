@@ -1,4 +1,7 @@
-use std::collections::{HashMap, HashSet};
+use std::{
+    cell::LazyCell,
+    collections::{HashMap, HashSet},
+};
 
 use wasm_bindgen::prelude::*;
 
@@ -83,30 +86,35 @@ pub fn is_sudoku_board_full(board: Vec<u8>) -> bool {
     !board.into_iter().any(|x| x == 0)
 }
 
+const SUDOKO_IDS: LazyCell<Vec<SodokuId>> = LazyCell::new(|| {
+    (0..SIZE_SQUARED)
+        .collect::<Vec<_>>()
+        .windows(SIZE)
+        .step_by(SIZE)
+        .enumerate()
+        .flat_map(|(y, xs)| xs.into_iter().map(|x| (y, x % SIZE)).collect::<Vec<_>>())
+        .map(|(y, x)| SodokuId::from(y, x))
+        .collect::<Vec<_>>()
+});
+
 #[wasm_bindgen]
 pub fn is_valid_sudoku(board: Vec<u8>) -> bool {
     assert_eq!(board.len(), SIZE_SQUARED);
     let mut map = HashMap::<u8, Sodoku>::with_capacity(SIZE);
     !board
-        .windows(SIZE)
-        .step_by(SIZE)
+        .into_iter()
         .enumerate()
-        .flat_map(|(y, row)| {
-            row.iter()
-                .enumerate()
-                .filter(|(_, x)| **x != 0)
-                .map(|(x, number)| (number, SodokuElement::from(y, x)))
-                .collect::<Vec<_>>()
-        })
-        .any(|(number, element)| {
-            match map.get_mut(number) {
+        .filter(|(_, x)| *x != 0)
+        .map(|(index, number)| (number, SUDOKO_IDS[index].clone()))
+        .any(|(number, id)| {
+            match map.get_mut(&number) {
                 Some(sodokus) => {
-                    if sodokus.exists(element) {
+                    if sodokus.exists(id) {
                         return true;
                     };
                 }
                 None => {
-                    map.insert(*number, Sodoku::new(element));
+                    map.insert(number, Sodoku::new(id));
                 }
             };
             false
@@ -120,7 +128,7 @@ struct Sodoku {
 }
 
 impl Sodoku {
-    fn new(SodokuElement { row, column, area }: SodokuElement) -> Self {
+    fn new(SodokuId { row, column, area }: SodokuId) -> Self {
         let mut rows = HashSet::with_capacity(9);
         let mut columns = HashSet::with_capacity(9);
         let mut areas = HashSet::with_capacity(9);
@@ -136,7 +144,7 @@ impl Sodoku {
         }
     }
 
-    fn exists(&mut self, SodokuElement { row, column, area }: SodokuElement) -> bool {
+    fn exists(&mut self, SodokuId { row, column, area }: SodokuId) -> bool {
         let rows = self.rows.insert(row);
         let columns = self.columns.insert(column);
         let areas = self.areas.insert(area);
@@ -144,13 +152,14 @@ impl Sodoku {
     }
 }
 
-struct SodokuElement {
+#[derive(Debug, Clone)]
+struct SodokuId {
     row: usize,
     column: usize,
     area: usize,
 }
 
-impl SodokuElement {
+impl SodokuId {
     fn from(row: usize, column: usize) -> Self {
         let area = (row / 3) * 3 + (column / 3);
         Self { row, column, area }
@@ -160,6 +169,57 @@ impl SodokuElement {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    pub fn test_sudoko_ids() {
+        assert_eq!(SUDOKO_IDS[0].row, 0);
+        assert_eq!(SUDOKO_IDS[0].column, 0);
+        assert_eq!(SUDOKO_IDS[0].area, 0);
+
+        assert_eq!(SUDOKO_IDS[1].row, 0);
+        assert_eq!(SUDOKO_IDS[1].column, 1);
+        assert_eq!(SUDOKO_IDS[1].area, 0);
+
+        assert_eq!(SUDOKO_IDS[4].row, 0);
+        assert_eq!(SUDOKO_IDS[4].column, 4);
+        assert_eq!(SUDOKO_IDS[4].area, 1);
+
+        assert_eq!(SUDOKO_IDS[5].row, 0);
+        assert_eq!(SUDOKO_IDS[5].column, 5);
+        assert_eq!(SUDOKO_IDS[5].area, 1);
+
+        assert_eq!(SUDOKO_IDS[7].row, 0);
+        assert_eq!(SUDOKO_IDS[7].column, 7);
+        assert_eq!(SUDOKO_IDS[7].area, 2);
+
+        assert_eq!(SUDOKO_IDS[8].row, 0);
+        assert_eq!(SUDOKO_IDS[8].column, 8);
+        assert_eq!(SUDOKO_IDS[8].area, 2);
+
+        assert_eq!(SUDOKO_IDS[9].row, 1);
+        assert_eq!(SUDOKO_IDS[9].column, 0);
+        assert_eq!(SUDOKO_IDS[9].area, 0);
+
+        assert_eq!(SUDOKO_IDS[10].row, 1);
+        assert_eq!(SUDOKO_IDS[10].column, 1);
+        assert_eq!(SUDOKO_IDS[10].area, 0);
+
+        assert_eq!(SUDOKO_IDS[12].row, 1);
+        assert_eq!(SUDOKO_IDS[12].column, 3);
+        assert_eq!(SUDOKO_IDS[12].area, 1);
+
+        assert_eq!(SUDOKO_IDS[15].row, 1);
+        assert_eq!(SUDOKO_IDS[15].column, 6);
+        assert_eq!(SUDOKO_IDS[15].area, 2);
+
+        assert_eq!(SUDOKO_IDS[17].row, 1);
+        assert_eq!(SUDOKO_IDS[17].column, 8);
+        assert_eq!(SUDOKO_IDS[17].area, 2);
+
+        assert_eq!(SUDOKO_IDS[27].row, 3);
+        assert_eq!(SUDOKO_IDS[27].column, 0);
+        assert_eq!(SUDOKO_IDS[27].area, 3);
+    }
 
     #[test]
     pub fn non_valid_levels() {
@@ -191,7 +251,7 @@ mod tests {
     #[test]
     fn valid_levels() {
         for i in 0..LEVELS_NUMBER {
-            assert!(is_valid_sudoku(get_level(i)));
+            debug_assert!(is_valid_sudoku(get_level(i)), "valid level number {}", i);
         }
     }
 
