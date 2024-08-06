@@ -1,9 +1,10 @@
-import { ChangeEvent, useContext } from "react";
+import { ChangeEvent, useContext, useMemo } from "react";
 import { valid_chars, ValidChar } from "./shared";
-import { BoardContext, BoardContextSetter } from "./BoardContext";
+import { BoardContext, BoardContextSetter, TriggerContext } from "./BoardContext";
 
 export function Column({ index }: { index : number }) {
     const rows = useContext(BoardContext);
+    const trigger = useContext(TriggerContext);
     const set_rows = useContext(BoardContextSetter);
 
     const on_input = (e: ChangeEvent<HTMLInputElement>) => {
@@ -19,12 +20,15 @@ export function Column({ index }: { index : number }) {
 
     const value = rows![index] || "" 
 
+    const disabled = useMemo(() => rows![index] !== 0,[trigger])
+
     return (
         <input
             id={`column-number-${index}`}
             className="size-20 text-center rounded-lg"
             pattern="^[0-9]$"
             value={value}
+            disabled={disabled}
             onInput={on_input}
          />
     );
