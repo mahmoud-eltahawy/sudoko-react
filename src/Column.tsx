@@ -25,7 +25,7 @@ export function Column({ index }: { index : number, }) {
     return (
         <input
             id={`column-number-${index}`}
-            className="size-24 text-center"
+            className="size-24 text-center rounded-lg"
             pattern="[0-9]"
             value={value}
             // disabled={disabled.current}

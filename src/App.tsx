@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect,  useState } from 'react'
 import { BoardContext, BoardContextSetter } from './BoardContext';
 import { Board } from './Board';
 import {is_valid_sudoku,is_sudoku_board_full,level} from 'blazing-fast'
@@ -32,6 +32,7 @@ function App() {
       set_index(x => x + 1);
       set_win_modal(false)               
   };
+
 
   return (
       <BoardContext.Provider value={board}>
