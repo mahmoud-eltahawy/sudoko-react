@@ -10,6 +10,17 @@ const LEVELS_NUMBER: usize = 6;
 const SIZE_SQUARED: usize = SIZE * SIZE;
 const TOTAL_LEVELS_SIZE: usize = SIZE_SQUARED * LEVELS_NUMBER;
 
+const SUDOKO_IDS: LazyCell<Vec<SodokuId>> = LazyCell::new(|| {
+    (0..SIZE_SQUARED)
+        .collect::<Vec<_>>()
+        .windows(SIZE)
+        .step_by(SIZE)
+        .enumerate()
+        .flat_map(|(y, xs)| xs.into_iter().map(|x| (y, x % SIZE)).collect::<Vec<_>>())
+        .map(|(y, x)| SodokuId::from(y, x))
+        .collect::<Vec<_>>()
+});
+
 const LEVELS: [u8; TOTAL_LEVELS_SIZE] = [
     // level 1
     1, 2, 3, 4, 5, 6, 7, 8, 9, //
@@ -74,10 +85,15 @@ const LEVELS: [u8; TOTAL_LEVELS_SIZE] = [
 ];
 
 #[wasm_bindgen]
+pub fn which_section(index: usize) -> usize {
+    SUDOKO_IDS[index].section
+}
+
+#[wasm_bindgen]
 pub fn get_level(index: usize) -> Vec<u8> {
     let index = index % LEVELS_NUMBER;
-    let begin = index * SIZE_SQUARED;
-    LEVELS[begin..(begin + SIZE_SQUARED)].to_vec()
+    let index = index * SIZE_SQUARED;
+    LEVELS[index..(index + SIZE_SQUARED)].to_vec()
 }
 
 #[wasm_bindgen]
@@ -85,17 +101,6 @@ pub fn is_sudoku_board_full(board: Vec<u8>) -> bool {
     assert_eq!(board.len(), SIZE_SQUARED);
     !board.into_iter().any(|x| x == 0)
 }
-
-const SUDOKO_IDS: LazyCell<Vec<SodokuId>> = LazyCell::new(|| {
-    (0..SIZE_SQUARED)
-        .collect::<Vec<_>>()
-        .windows(SIZE)
-        .step_by(SIZE)
-        .enumerate()
-        .flat_map(|(y, xs)| xs.into_iter().map(|x| (y, x % SIZE)).collect::<Vec<_>>())
-        .map(|(y, x)| SodokuId::from(y, x))
-        .collect::<Vec<_>>()
-});
 
 #[wasm_bindgen]
 pub fn is_valid_sudoku(board: Vec<u8>) -> bool {
@@ -124,41 +129,41 @@ pub fn is_valid_sudoku(board: Vec<u8>) -> bool {
 struct Sodoku {
     rows: HashSet<usize>,
     columns: HashSet<usize>,
-    areas: HashSet<usize>,
+    sections: HashSet<usize>,
 }
 
 impl Sodoku {
-    fn new(SodokuId { row, column, area }: &SodokuId) -> Self {
+    fn new(SodokuId { y, x, section }: &SodokuId) -> Self {
         let mut rows = HashSet::with_capacity(9);
         let mut columns = HashSet::with_capacity(9);
-        let mut areas = HashSet::with_capacity(9);
+        let mut sections = HashSet::with_capacity(9);
 
-        rows.insert(*row);
-        columns.insert(*column);
-        areas.insert(*area);
+        rows.insert(*y);
+        columns.insert(*x);
+        sections.insert(*section);
 
         Self {
             rows,
             columns,
-            areas,
+            sections,
         }
     }
 
-    fn exists(&mut self, SodokuId { row, column, area }: &SodokuId) -> bool {
-        !self.rows.insert(*row) || !self.columns.insert(*column) || !self.areas.insert(*area)
+    fn exists(&mut self, SodokuId { y, x, section }: &SodokuId) -> bool {
+        !self.rows.insert(*y) || !self.columns.insert(*x) || !self.sections.insert(*section)
     }
 }
 
 struct SodokuId {
-    row: usize,
-    column: usize,
-    area: usize,
+    y: usize,
+    x: usize,
+    section: usize,
 }
 
 impl SodokuId {
-    fn from(row: usize, column: usize) -> Self {
-        let area = (row / 3) * 3 + (column / 3);
-        Self { row, column, area }
+    fn from(y: usize, x: usize) -> Self {
+        let section = (y / 3) * 3 + (x / 3);
+        Self { y, x, section }
     }
 }
 
@@ -168,53 +173,57 @@ mod tests {
 
     #[test]
     pub fn test_sudoko_ids() {
-        assert_eq!(SUDOKO_IDS[0].row, 0);
-        assert_eq!(SUDOKO_IDS[0].column, 0);
-        assert_eq!(SUDOKO_IDS[0].area, 0);
+        assert_eq!(SUDOKO_IDS[0].y, 0);
+        assert_eq!(SUDOKO_IDS[0].x, 0);
+        assert_eq!(SUDOKO_IDS[0].section, 0);
 
-        assert_eq!(SUDOKO_IDS[1].row, 0);
-        assert_eq!(SUDOKO_IDS[1].column, 1);
-        assert_eq!(SUDOKO_IDS[1].area, 0);
+        assert_eq!(SUDOKO_IDS[1].y, 0);
+        assert_eq!(SUDOKO_IDS[1].x, 1);
+        assert_eq!(SUDOKO_IDS[1].section, 0);
 
-        assert_eq!(SUDOKO_IDS[4].row, 0);
-        assert_eq!(SUDOKO_IDS[4].column, 4);
-        assert_eq!(SUDOKO_IDS[4].area, 1);
+        assert_eq!(SUDOKO_IDS[4].y, 0);
+        assert_eq!(SUDOKO_IDS[4].x, 4);
+        assert_eq!(SUDOKO_IDS[4].section, 1);
 
-        assert_eq!(SUDOKO_IDS[5].row, 0);
-        assert_eq!(SUDOKO_IDS[5].column, 5);
-        assert_eq!(SUDOKO_IDS[5].area, 1);
+        assert_eq!(SUDOKO_IDS[5].y, 0);
+        assert_eq!(SUDOKO_IDS[5].x, 5);
+        assert_eq!(SUDOKO_IDS[5].section, 1);
 
-        assert_eq!(SUDOKO_IDS[7].row, 0);
-        assert_eq!(SUDOKO_IDS[7].column, 7);
-        assert_eq!(SUDOKO_IDS[7].area, 2);
+        assert_eq!(SUDOKO_IDS[7].y, 0);
+        assert_eq!(SUDOKO_IDS[7].x, 7);
+        assert_eq!(SUDOKO_IDS[7].section, 2);
 
-        assert_eq!(SUDOKO_IDS[8].row, 0);
-        assert_eq!(SUDOKO_IDS[8].column, 8);
-        assert_eq!(SUDOKO_IDS[8].area, 2);
+        assert_eq!(SUDOKO_IDS[8].y, 0);
+        assert_eq!(SUDOKO_IDS[8].x, 8);
+        assert_eq!(SUDOKO_IDS[8].section, 2);
 
-        assert_eq!(SUDOKO_IDS[9].row, 1);
-        assert_eq!(SUDOKO_IDS[9].column, 0);
-        assert_eq!(SUDOKO_IDS[9].area, 0);
+        assert_eq!(SUDOKO_IDS[9].y, 1);
+        assert_eq!(SUDOKO_IDS[9].x, 0);
+        assert_eq!(SUDOKO_IDS[9].section, 0);
 
-        assert_eq!(SUDOKO_IDS[10].row, 1);
-        assert_eq!(SUDOKO_IDS[10].column, 1);
-        assert_eq!(SUDOKO_IDS[10].area, 0);
+        assert_eq!(SUDOKO_IDS[10].y, 1);
+        assert_eq!(SUDOKO_IDS[10].x, 1);
+        assert_eq!(SUDOKO_IDS[10].section, 0);
 
-        assert_eq!(SUDOKO_IDS[12].row, 1);
-        assert_eq!(SUDOKO_IDS[12].column, 3);
-        assert_eq!(SUDOKO_IDS[12].area, 1);
+        assert_eq!(SUDOKO_IDS[12].y, 1);
+        assert_eq!(SUDOKO_IDS[12].x, 3);
+        assert_eq!(SUDOKO_IDS[12].section, 1);
 
-        assert_eq!(SUDOKO_IDS[15].row, 1);
-        assert_eq!(SUDOKO_IDS[15].column, 6);
-        assert_eq!(SUDOKO_IDS[15].area, 2);
+        assert_eq!(SUDOKO_IDS[15].y, 1);
+        assert_eq!(SUDOKO_IDS[15].x, 6);
+        assert_eq!(SUDOKO_IDS[15].section, 2);
 
-        assert_eq!(SUDOKO_IDS[17].row, 1);
-        assert_eq!(SUDOKO_IDS[17].column, 8);
-        assert_eq!(SUDOKO_IDS[17].area, 2);
+        assert_eq!(SUDOKO_IDS[17].y, 1);
+        assert_eq!(SUDOKO_IDS[17].x, 8);
+        assert_eq!(SUDOKO_IDS[17].section, 2);
 
-        assert_eq!(SUDOKO_IDS[27].row, 3);
-        assert_eq!(SUDOKO_IDS[27].column, 0);
-        assert_eq!(SUDOKO_IDS[27].area, 3);
+        assert_eq!(SUDOKO_IDS[27].y, 3);
+        assert_eq!(SUDOKO_IDS[27].x, 0);
+        assert_eq!(SUDOKO_IDS[27].section, 3);
+
+        assert_eq!(SUDOKO_IDS[80].y, 8);
+        assert_eq!(SUDOKO_IDS[80].x, 8);
+        assert_eq!(SUDOKO_IDS[80].section, 8);
     }
 
     #[test]
