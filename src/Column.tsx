@@ -2,7 +2,7 @@ import { ChangeEvent, useContext } from "react";
 import { valid_chars, ValidChar } from "./shared";
 import { BoardContext, BoardContextSetter } from "./BoardContext";
 
-export function Column({ index }: { index : number, }) {
+export function Column({ index }: { index : number }) {
     const rows = useContext(BoardContext);
     const set_rows = useContext(BoardContextSetter);
 
@@ -17,18 +17,14 @@ export function Column({ index }: { index : number, }) {
         }
     };
 
-    const column_value = rows![index];
-    // const disabled = useRef(column_value !== 0);
-
-    const value = column_value === 0 ? "" : column_value
+    const value = rows![index] || "" 
 
     return (
         <input
             id={`column-number-${index}`}
             className="size-24 text-center rounded-lg"
-            pattern="[0-9]"
+            pattern="^[0-9]$"
             value={value}
-            // disabled={disabled.current}
             onInput={on_input}
          />
     );
