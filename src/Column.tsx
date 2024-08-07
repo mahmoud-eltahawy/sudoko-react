@@ -42,7 +42,7 @@ function which_color(index : number) :string {
         case 1:
            return "text-amber-500"         
         case 2:
-           return "text-lime-500"         
+           return "text-blue-500"         
         case 3:
            return "text-cyan-500"         
         case 4:
@@ -50,7 +50,7 @@ function which_color(index : number) :string {
         case 5:
            return "text-fuchsia-500"         
         case 6:
-           return "text-blue-500"         
+           return "text-lime-500"         
         case 7:
            return "text-rose-500"         
         case 8:
